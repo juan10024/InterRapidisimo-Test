@@ -6,28 +6,28 @@
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/data-source.js';
 import { redisClient } from '../../cache/RedisClient.js';
+import { sendSuccess, sendError } from '../utils/responseHelper.js';
 
 export const getHealthStatus = async (_req: Request, res: Response): Promise<void> => {
   const timestamp = new Date().toISOString();
   
-  // Validar Estado de PostgreSQL
   let isDbHealthy = false;
-  let dbMessage = 'Disconnected';
+  let dbMessage = 'Healthy';
   
   try {
     // Verifica si TypeORM completó la inicialización y ejecuta una consulta ligera
     if (AppDataSource.isInitialized) {
       await AppDataSource.query('SELECT 1');
       isDbHealthy = true;
-      dbMessage = 'Healthy';
+    } else {
+      dbMessage = 'Disconnected';
     }
   } catch (error) {
     dbMessage = error instanceof Error ? error.message : 'Database query failed';
   }
 
-  // Validar Estado de Redis
   let isRedisHealthy = false;
-  let redisMessage = 'Disconnected';
+  let redisMessage = 'Healthy';
   
   try {
     // Verifica si el cliente de Redis está abierto y responde al comando PING
@@ -35,8 +35,11 @@ export const getHealthStatus = async (_req: Request, res: Response): Promise<voi
       const pong = await redisClient.ping();
       if (pong === 'PONG') {
         isRedisHealthy = true;
-        redisMessage = 'Healthy';
+      } else {
+        redisMessage = 'Unexpected response';
       }
+    } else {
+      redisMessage = 'Disconnected';
     }
   } catch (error) {
     redisMessage = error instanceof Error ? error.message : 'Redis ping failed';
@@ -44,10 +47,8 @@ export const getHealthStatus = async (_req: Request, res: Response): Promise<voi
 
   // Determinar el estado general del sistema
   const isSystemHealthy = isDbHealthy && isRedisHealthy;
-  const httpStatus = isSystemHealthy ? 200 : 503; 
 
-  res.status(httpStatus).json({
-    status: isSystemHealthy ? 'success' : 'error',
+  const healthData = {
     timestamp,
     services: {
       database: {
@@ -59,5 +60,20 @@ export const getHealthStatus = async (_req: Request, res: Response): Promise<voi
         message: redisMessage
       }
     }
-  });
+  };
+
+  if (isSystemHealthy) {
+    sendSuccess(res, {
+      statusCode: 200,
+      message: 'Todos los servicios de infraestructura están operativos.',
+      data: healthData
+    });
+  } else {
+    sendError(res, {
+      statusCode: 503,
+      message: 'Uno o más servicios de infraestructura no responden.',
+      errors: [healthData.services]
+    });
+  }
 };
+

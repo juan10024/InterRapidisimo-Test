@@ -6,6 +6,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ProductRepository } from '../../database/repositories/ProductRepository.js';
 import { GetPaginatedProducts } from '../../../application/use-cases/GetPaginatedProducts.js';
+import { sendSuccess } from '../utils/responseHelper.js';
 
 export class ProductController {
   private readonly productRepository = new ProductRepository();
@@ -17,8 +18,9 @@ export class ProductController {
       const queryDto = req.query as any; 
       const result = await this.getPaginatedProducts.execute(queryDto);
       
-      res.status(200).json({
-        status: 'success',
+      sendSuccess(res, {
+        statusCode: 200,
+        message: 'Productos paginados obtenidos correctamente.',
         data: result
       });
     } catch (error) {

@@ -7,6 +7,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { UserRepository } from '../../database/repositories/UserRepository.js';
 import { ProductRepository } from '../../database/repositories/ProductRepository.js';
 import { ExecuteRewardAction } from '../../../application/use-cases/ExecuteRewardAction.js';
+import { sendSuccess } from '../utils/responseHelper.js';
 
 export class RewardController {
   private readonly userRepository = new UserRepository();
@@ -18,8 +19,8 @@ export class RewardController {
       const inputDto = req.body;
       const result = await this.executeRewardAction.execute(inputDto);
       
-      res.status(200).json({
-        status: 'success',
+      sendSuccess(res, {
+        statusCode: 200,
         message: 'Recompensa procesada y asignada con éxito.',
         data: result
       });
