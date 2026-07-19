@@ -4,12 +4,14 @@
 
 import { 
   PaginatedProductsResponseSchema, 
-  RewardActionResponseSchema 
+  RewardActionResponseSchema,
+  SingleProductResponseSchema
 } from '../../domain/schemas/apiSchemas';
 import type { 
   PaginatedProductsResponse, 
   RewardActionRequest, 
-  RewardActionResponse 
+  RewardActionResponse,
+  SingleProductResponse
 } from '../../domain/models';
 
 const API_BASE_URL = 'http://localhost:3000/api/v1';
@@ -34,9 +36,7 @@ export const apiClient = {
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      }
+      headers: { 'Accept': 'application/json' }
     });
     
     if (!response.ok) {
@@ -44,8 +44,25 @@ export const apiClient = {
     }
 
     const data = await response.json();
-    
     return PaginatedProductsResponseSchema.parse(data);
+  },
+
+  /*
+   * Obtiene un producto por su ID.
+   */
+  async getProductById(id: string): Promise<SingleProductResponse> {
+    const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error HTTP al obtener producto: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return SingleProductResponseSchema.parse(data);
   },
 
   /*
@@ -62,11 +79,11 @@ export const apiClient = {
     });
 
     if (!response.ok) {
-      throw new Error(`Error HTTP al procesar recompensa: ${response.status} ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error HTTP al procesar recompensa: ${response.status}`);
     }
 
     const data = await response.json();
-    
     return RewardActionResponseSchema.parse(data);
   }
 };

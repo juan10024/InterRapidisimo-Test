@@ -6,7 +6,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ProductRepository } from '../../database/repositories/ProductRepository.js';
 import { GetPaginatedProducts } from '../../../application/use-cases/GetPaginatedProducts.js';
-import { sendSuccess } from '../utils/responseHelper.js';
+import { sendSuccess, sendError } from '../utils/responseHelper.js';
 
 export class ProductController {
   private readonly productRepository = new ProductRepository();
@@ -22,6 +22,38 @@ export class ProductController {
         statusCode: 200,
         message: 'Productos paginados obtenidos correctamente.',
         data: result
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params as { id: string };
+      const product = await this.productRepository.findById(id);
+
+      if (!product) {
+        sendError(res, {
+          statusCode: 404,
+          message: `El producto con id '${id}' no fue encontrado.`,
+        });
+        return;
+      }
+
+      sendSuccess(res, {
+        statusCode: 200,
+        message: 'Producto obtenido correctamente.',
+        data: {
+          product: {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            category: product.category,
+            imageUrl: product.imageUrl,
+            stock: product.stock,
+          }
+        }
       });
     } catch (error) {
       next(error);

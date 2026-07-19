@@ -8,9 +8,10 @@ import type { Product } from '../../domain/models';
 
 interface Props {
   product: Product;
+  onSelect?: () => void;
 }
 
-export function ProductCard({ product }: Props) {
+export function ProductCard({ product, onSelect }: Props) {
   const triggerRewardAction = useUserStore(state => state.triggerRewardAction);
   const isProcessing = useUserStore(state => state.isProcessingReward);
   const [isFavorited, setIsFavorited] = useState(false);
@@ -28,7 +29,15 @@ export function ProductCard({ product }: Props) {
 
   return (
     <div className="bg-custom-card border border-custom-border rounded-lg p-sm flex flex-col gap-sm group">
-      <div className="relative w-full aspect-video border border-custom-border rounded overflow-hidden">
+      {/* Imagen clickeable para navegar al detalle */}
+      <div
+        className="relative w-full aspect-video border border-custom-border rounded overflow-hidden cursor-pointer"
+        onClick={onSelect}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && onSelect?.()}
+        aria-label={`Ver detalle de ${product.name}`}
+      >
         <img 
           alt={product.name} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
@@ -36,7 +45,7 @@ export function ProductCard({ product }: Props) {
         />
         {/* Botón de favorito sobre la imagen */}
         <button
-          onClick={handleFavorite}
+          onClick={(e) => { e.stopPropagation(); handleFavorite(); }}
           disabled={isProcessing}
           title={isFavorited ? 'Quitar de favoritos' : 'Agregar a favoritos'}
           className={`absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-full border transition-all duration-200 ${

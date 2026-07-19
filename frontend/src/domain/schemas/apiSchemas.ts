@@ -47,3 +47,12 @@ export const RewardActionResponseSchema = z.object({
     newPointsBalance: z.number().int().nonnegative()
   })
 });
+
+// SCHEMA: PRODUCTO INDIVIDUAL
+export const SingleProductResponseSchema = z.object({
+  status: z.literal("success"),
+  message: z.string(),
+  data: z.object({
+    product: ProductSchema
+  })
+});

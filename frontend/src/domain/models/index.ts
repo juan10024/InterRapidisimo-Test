@@ -8,7 +8,8 @@ import {
   PaginationMetaSchema,
   PaginatedProductsResponseSchema,
   RewardActionRequestSchema,
-  RewardActionResponseSchema
+  RewardActionResponseSchema,
+  SingleProductResponseSchema
 } from '../schemas/apiSchemas';
 
 // Tipos inmutables exportados para el resto de la aplicación
@@ -18,3 +19,5 @@ export type PaginatedProductsResponse = z.infer<typeof PaginatedProductsResponse
 
 export type RewardActionRequest = z.infer<typeof RewardActionRequestSchema>;
 export type RewardActionResponse = z.infer<typeof RewardActionResponseSchema>;
+
+export type SingleProductResponse = z.infer<typeof SingleProductResponseSchema>;

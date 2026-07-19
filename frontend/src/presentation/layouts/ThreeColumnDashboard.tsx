@@ -7,7 +7,11 @@ import { useProductStore } from '../../application/store/useProductStore';
 import { ProductCard } from '../components/ProductCard';
 import { GamificationHub } from '../components/GamificationHub';
 
-export function ThreeColumnDashboard() {
+interface Props {
+  onSelectProduct: (productId: string) => void;
+}
+
+export function ThreeColumnDashboard({ onSelectProduct }: Props) {
   const { products, isLoading, fetchProducts } = useProductStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -142,7 +146,7 @@ export function ThreeColumnDashboard() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-sm">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} onSelect={() => onSelectProduct(product.id)} />
               ))}
             </div>
           </div>

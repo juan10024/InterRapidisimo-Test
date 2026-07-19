@@ -23,3 +23,9 @@ export const ExecuteRewardSchema = z.object({
     }),
   }),
 });
+
+export const GetProductByIdSchema = z.object({
+  params: z.object({
+    id: z.string().uuid({ message: 'El id del producto debe ser un UUID válido.' }),
+  }),
+});
