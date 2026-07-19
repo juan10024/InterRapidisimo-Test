@@ -1,20 +1,51 @@
+/* Importación de fuentes desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+/* Importación base de Tailwind v4 */
 @import "tailwindcss";
 
+/* Configuración del tema integrado en Tailwind v4 */
 @theme {
   /* Paleta de colores */
-  --color-obsidian: #0F1115;
-  --color-graphite: #161920;
-  --color-border-subtle: #242936;
-  --color-esmeralda: #00E5A3;
-  --color-coral: #FF4B5C;
+  --color-custom-bg: #0F1115;
+  --color-custom-card: #161920;
+  --color-custom-border: #242936;
+  --color-custom-error: #FF4B5C;
+  
+  --color-primary: #6effc3;
+  --color-primary-container: #00e5a3;
+  
+  --color-on-surface: #dbe5dd;
+  --color-on-surface-variant: #bacbbf;
 
-  /* Tipografías seleccionadas */
-  --font-display: "Space Grotesk", sans-serif;
-  --font-sans: "Plus Jakarta Sans", sans-serif;
+  /* Sistema tipográfico */
+  --font-display-lg: 'Space Grotesk', sans-serif;
+  --font-headline-lg: 'Space Grotesk', sans-serif;
+  --font-body-lg: 'Plus Jakarta Sans', sans-serif;
+  --font-body-md: 'Plus Jakarta Sans', sans-serif;
+  --font-label-md: 'Space Grotesk', sans-serif;
+  --font-label-sm: 'Space Grotesk', sans-serif;
+  --font-price-display: 'Space Grotesk', sans-serif;
+
+  /* Espaciado del sistema */
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 40px;
+  --spacing-margin-desktop: 32px;
 }
 
+/* Clases utilitarias personalizadas */
+@layer utilities {
+  .hard-shadow {
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.4);
+  }
+}
+
+/* Reseteos globales de la marca */
 body {
-  background-color: var(--color-obsidian);
-  color: #F3F4F6;
-  font-family: var(--font-sans);
+  background-color: var(--color-custom-bg);
+  color: var(--color-on-surface);
+  font-family: var(--font-body-md);
+  -webkit-font-smoothing: antialiased;
 }

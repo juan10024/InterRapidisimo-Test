@@ -1,11 +1,10 @@
-import './App.css'
+import './index.css'
+import { ThreeColumnDashboard } from './presentation/layouts/ThreeColumnDashboard'
 
 function App() {
 
   return (
-    <>
-      <h1>Hello World</h1>
-    </>
+      <ThreeColumnDashboard />
   )
 }
 
