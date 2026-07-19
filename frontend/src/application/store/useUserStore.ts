@@ -29,8 +29,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   level: 3,
   // Actividades iniciales para poblar el UI basado en el diseño
   activities: [
-    { id: 'evt-1', description: 'Daily Login', points: 10, icon: 'military_tech' },
-    { id: 'evt-2', description: 'Shared Wishlist', points: 25, icon: 'share' }
+    { id: 'evt-1', description: 'Inicio de Sesión Diario', points: 10, icon: 'military_tech' },
+    { id: 'evt-2', description: 'Lista de Deseos Compartida', points: 25, icon: 'share' }
   ],
   isProcessingReward: false,
 

@@ -15,20 +15,28 @@
   
   --color-primary: #6effc3;
   --color-primary-container: #00e5a3;
+  --color-on-primary-container: #006143;
+  
+  --color-surface: #0d1511;
+  --color-surface-container-lowest: #08100c;
+  --color-surface-container-high: #232c27;
   
   --color-on-surface: #dbe5dd;
   --color-on-surface-variant: #bacbbf;
+  --color-outline-variant: #3b4a42;
 
   /* Sistema tipográfico */
-  --font-display-lg: 'Space Grotesk', sans-serif;
-  --font-headline-lg: 'Space Grotesk', sans-serif;
-  --font-body-lg: 'Plus Jakarta Sans', sans-serif;
-  --font-body-md: 'Plus Jakarta Sans', sans-serif;
-  --font-label-md: 'Space Grotesk', sans-serif;
-  --font-label-sm: 'Space Grotesk', sans-serif;
-  --font-price-display: 'Space Grotesk', sans-serif;
+  --font-display-lg: "Space Grotesk", sans-serif;
+  --font-headline-lg: "Space Grotesk", sans-serif;
+  --font-price-display: "Space Grotesk", sans-serif;
+  --font-label-md: "Space Grotesk", sans-serif;
+  --font-label-sm: "Space Grotesk", sans-serif;
+  
+  --font-body-lg: "Plus Jakarta Sans", sans-serif;
+  --font-body-md: "Plus Jakarta Sans", sans-serif;
 
   /* Espaciado del sistema */
+  --spacing-xs: 8px;
   --spacing-sm: 16px;
   --spacing-md: 24px;
   --spacing-lg: 40px;
@@ -37,15 +45,50 @@
 
 /* Clases utilitarias personalizadas */
 @layer utilities {
-  .hard-shadow {
-    box-shadow: 4px 4px 0px rgba(0,0,0,0.4);
+  .hard-shadow { 
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.4); 
+  }
+  .hard-shadow:hover { 
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.4); 
+    transform: translate(-2px, -2px); 
+  }
+  .active-chip { 
+    background-color: #00E5A3; 
+    color: black; 
+  }
+  .inactive-chip { 
+    background-color: #242936; 
+    color: #dbe5dd; 
+  }
+  .material-symbols-fill {
+    font-variation-settings: 'FILL' 1;
+  }
+  .search-input {
+    width: 100%;
+    background-color: var(--color-custom-bg);
+    border: 1px solid var(--color-custom-border);
+    color: var(--color-on-surface);
+    font-family: var(--font-body-md);
+    padding-left: 2.5rem;
+    padding-right: 0.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+  .search-input:focus {
+    border-color: var(--color-primary);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  .search-input::placeholder {
+    color: var(--color-on-surface-variant);
   }
 }
 
 /* Reseteos globales de la marca */
 body {
-  background-color: var(--color-custom-bg);
-  color: var(--color-on-surface);
-  font-family: var(--font-body-md);
-  -webkit-font-smoothing: antialiased;
+  @apply bg-custom-bg text-on-surface font-body-md min-h-screen flex flex-col;
 }
