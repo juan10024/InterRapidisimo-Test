@@ -25,8 +25,8 @@ interface UserState {
 export const useUserStore = create<UserState>((set, get) => ({
   // Datos hardcodeados para el MVP
   userId: "550e8400-e29b-41d4-a716-446655440000",
-  points: 150, 
-  level: 3,
+  points: 0, 
+  level: 1,
   // Actividades iniciales para poblar el UI basado en el diseño
   activities: [
     { id: 'evt-1', description: 'Inicio de Sesión Diario', points: 10, icon: 'military_tech' },

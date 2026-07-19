@@ -19,6 +19,12 @@ interface CartState {
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   toggleWishlist: (product: Product) => void;
+  /**
+   * Orquesta la compra: dispara la acción de recompensa por cada ítem en el
+   * backend (capa de Application) y luego limpia el carrito.
+   * El frontend NO calcula puntos — eso es responsabilidad del backend.
+   */
+  checkoutCart: () => Promise<void>;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
@@ -64,6 +70,25 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   clearCart: () => set({ cartItems: [] }),
+
+  checkoutCart: async () => {
+    const { cartItems } = get();
+    const { triggerRewardAction } = useUserStore.getState();
+
+    // Disparar la recompensa de PURCHASE por cada ítem — el backend calcula los puntos
+    await Promise.allSettled(
+      cartItems.map(item =>
+        triggerRewardAction(
+          item.product.id,
+          'PURCHASE',
+          `Compró ${item.product.name.split(' ')[0]} x${item.quantity}`
+        )
+      )
+    );
+
+    // Limpiar el carrito una vez procesadas las recompensas
+    set({ cartItems: [] });
+  },
 
   toggleWishlist: (product) => {
     const { wishlist } = get();

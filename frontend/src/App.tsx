@@ -1,10 +1,11 @@
 import './index.css'
 import { useState } from 'react'
 import { ThreeColumnDashboard } from './presentation/layouts/ThreeColumnDashboard'
-import { ProductDetailPage } from './presentation/pages/ProductDetailPage'
+import { ProductDetailPage } from './presentation/pages/ProductDetail'
 import { Preloader } from './presentation/components/Preloader'
 import { Background } from './presentation/components/Background'
-import { CheckoutPage } from './presentation/pages/CheckoutPage'
+import { CheckoutPage } from './presentation/pages/Checkout'
+import { Toast } from './presentation/components/Toast'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -29,6 +30,8 @@ function App() {
   return (
     <>
       <Background />
+      {/* Toast global — flotante sobre todas las páginas */}
+      <Toast />
 
       {/* Contenedor relativo para asegurar que el contenido se superponga al fondo */}
       <div className="relative z-10">

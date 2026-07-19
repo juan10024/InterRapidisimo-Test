@@ -4,6 +4,7 @@
 
 import { useUserStore } from '../../application/store/useUserStore';
 import { useCartStore } from '../../application/store/useCartStore';
+import { useToastStore } from '../../application/store/useToastStore';
 import type { Product } from '../../domain/models';
 
 interface Props {
@@ -16,15 +17,24 @@ export function ProductCard({ product, onSelect }: Props) {
   const wishlist = useCartStore(state => state.wishlist);
   const toggleWishlist = useCartStore(state => state.toggleWishlist);
   const addToCart = useCartStore(state => state.addToCart);
+  const showToast = useToastStore(state => state.showToast);
 
   const isFavorited = wishlist.some(p => p.id === product.id);
 
   const handleAdd = () => {
     addToCart(product, 1);
+    showToast('Cargamento Actualizado', `${product.name} añadido al carrito.`);
   };
 
   const handleFavorite = () => {
+    const wasAlreadyFavorited = wishlist.some(p => p.id === product.id);
     toggleWishlist(product);
+    showToast(
+      wasAlreadyFavorited ? 'Removido de Favoritos' : 'Añadido a Favoritos',
+      wasAlreadyFavorited
+        ? `${product.name} fue removido de tu lista.`
+        : `${product.name} añadido a tus favoritos.`
+    );
   };
 
   return (
