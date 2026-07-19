@@ -10,7 +10,6 @@ export interface ExecuteRewardActionInputDto {
 }
 
 export interface RewardActionResponseDto {
-  success: boolean;
   actionType: string;
   pointsAwarded: number;
   newPointsBalance: number;

@@ -10,18 +10,18 @@ export class ProductSchema {
   @PrimaryColumn("uuid")
   id!: string;
 
-  @Column()
+  @Column("varchar")
   name!: string;
 
   @Column("numeric", { precision: 10, scale: 2 })
   price!: number;
 
-  @Column()
+  @Column("varchar")
   category!: string;
 
-  @Column({ name: "image_url" })
+  @Column("text", { name: "image_url" })
   imageUrl!: string;
 
-  @Column()
+  @Column("integer") 
   stock!: number;
 }

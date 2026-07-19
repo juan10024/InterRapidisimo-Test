@@ -10,12 +10,12 @@ export class UserSchema {
   @PrimaryColumn("uuid")
   id!: string;
 
-  @Column({ unique: true })
+  @Column("varchar", { unique: true }) 
   email!: string;
 
-  @Column({ name: "points_balance", default: 0 })
+  @Column("integer", { name: "points_balance", default: 0 }) 
   pointsBalance!: number;
 
-  @UpdateDateColumn({ name: "updated_at" })
+  @UpdateDateColumn({ name: "updated_at", type: "timestamp" }) 
   updatedAt!: Date;
 }

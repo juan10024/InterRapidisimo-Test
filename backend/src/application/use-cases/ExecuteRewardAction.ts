@@ -60,7 +60,6 @@ export class ExecuteRewardAction {
     await this.userRepository.logRewardAction(user.id, actionType, pointsToAward);
 
     return {
-      success: true,
       actionType,
       pointsAwarded: pointsToAward,
       newPointsBalance: user.pointsBalance,

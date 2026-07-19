@@ -10,15 +10,15 @@ export class RewardLogSchema {
   @PrimaryColumn("uuid")
   id!: string;
 
-  @Column({ name: "user_id" })
+  @Column("uuid", { name: "user_id" })
   userId!: string;
 
-  @Column({ name: "action_type" })
+  @Column("varchar", { name: "action_type" })
   actionType!: string;
 
-  @Column({ name: "points_awarded" })
+  @Column("integer", { name: "points_awarded" })
   pointsAwarded!: number;
 
-  @CreateDateColumn({ name: "created_at" })
+  @CreateDateColumn({ name: "created_at", type: "timestamp" })
   createdAt!: Date;
 }
