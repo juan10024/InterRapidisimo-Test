@@ -13,6 +13,11 @@ interface Activity {
   icon: string;
 }
 
+interface PointsGain {
+  id: number;
+  amount: number;
+}
+
 interface UserState {
   userId: string | null;
   points: number;
@@ -20,7 +25,9 @@ interface UserState {
   isLoadingUser: boolean;
   userError: string | null;
   isProcessingReward: boolean;
+  pointsGain: PointsGain | null;
   loadCurrentUser: () => Promise<void>;
+  dismissPointsGain: () => void;
   triggerRewardAction: (productId: string, actionType: RewardActionRequest['actionType'], description: string) => Promise<void>;
 }
 
@@ -35,6 +42,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   isLoadingUser: false,
   userError: null,
   isProcessingReward: false,
+  pointsGain: null,
 
   loadCurrentUser: async () => {
     if (get().isLoadingUser) {
@@ -55,6 +63,8 @@ export const useUserStore = create<UserState>((set, get) => ({
       set({ userId: null, isLoadingUser: false, userError: message });
     }
   },
+
+  dismissPointsGain: () => set({ pointsGain: null }),
 
   triggerRewardAction: async (productId, actionType, description) => {
     const { userId } = get();
@@ -87,7 +97,8 @@ export const useUserStore = create<UserState>((set, get) => ({
           },
           ...state.activities
         ],
-        isProcessingReward: false
+        isProcessingReward: false,
+        pointsGain: { id: Date.now(), amount: response.data.pointsAwarded }
       }));
     } catch (error) {
       console.error("Error al procesar la recompensa:", error);

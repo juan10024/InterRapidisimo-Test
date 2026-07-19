@@ -13,6 +13,7 @@ import { ProductAccordions } from './components/ProductAccordions';
 import { CartSidebar } from './components/CartSidebar';
 import { FrequentlyBoughtTogether } from './components/FrequentlyBoughtTogether';
 import { GamificationSidebar } from './components/GamificationSidebar';
+import { CommandSidebar } from '../../components/CommandSidebar';
 
 interface Props {
   productId: string;
@@ -62,50 +63,14 @@ export function ProductDetailPage({ productId, onBack, onNavigate }: Props) {
       <header className="md:hidden sticky top-0 z-50 flex justify-between items-center px-4 py-2 w-full bg-surface-container-lowest shadow-[4px_4px_0px_rgba(0,0,0,0.4)]">
         <div className="font-display-lg text-[24px] font-bold text-primary tracking-tighter uppercase">OBSIDIAN</div>
         <div className="flex items-center gap-4 text-on-surface-variant">
-          <span className="material-symbols-outlined hover:text-primary transition-colors cursor-pointer text-[24px]">
-            account_balance_wallet
-          </span>
+          <button onClick={() => onNavigate?.('checkout')} className="material-symbols-outlined hover:text-primary transition-colors text-[24px]" aria-label="Ir al carrito">
+            shopping_cart
+          </button>
         </div>
       </header>
 
       {/* SideNavBar Desktop */}
-      <nav className="hidden md:flex flex-col h-screen py-6 px-4 bg-surface border-r border-custom-border w-70 sticky top-0 shrink-0">
-        <div className="mb-10 px-4">
-          <h1 className="font-display-lg text-[32px] font-bold text-primary uppercase tracking-tighter leading-tight">
-            Centro de Comando
-          </h1>
-          <p className="font-label-md text-[14px] text-on-surface-variant mt-2">Rango Élite</p>
-        </div>
-        <div className="flex flex-col gap-1 flex-1">
-          <a onClick={onBack} className="flex items-center gap-4 text-on-surface-variant hover:text-primary px-4 py-2 hover:bg-surface-container-high transition-colors duration-200 rounded cursor-pointer">
-            <span className="material-symbols-outlined">grid_view</span>
-            <span className="font-label-md text-[14px]">Panel de Control</span>
-          </a>
-          <a onClick={onBack} className="flex items-center gap-4 bg-primary-container text-on-primary-container border-r-4 border-primary px-4 py-2 translate-x-1 transition-transform duration-200 rounded cursor-pointer">
-            <span className="material-symbols-outlined material-symbols-fill">shopping_bag</span>
-            <span className="font-label-md text-[14px] font-bold">Catálogo</span>
-          </a>
-          <a className="flex items-center gap-4 text-on-surface-variant hover:text-primary px-4 py-2 hover:bg-surface-container-high transition-colors duration-200 rounded" href="#">
-            <span className="material-symbols-outlined">receipt_long</span>
-            <span className="font-label-md text-[14px]">Pedidos</span>
-          </a>
-          <a className="flex items-center gap-4 text-on-surface-variant hover:text-primary px-4 py-2 hover:bg-surface-container-high transition-colors duration-200 rounded" href="#">
-            <span className="material-symbols-outlined">inventory_2</span>
-            <span className="font-label-md text-[14px]">Inventario</span>
-          </a>
-          <a className="flex items-center gap-4 text-on-surface-variant hover:text-primary px-4 py-2 hover:bg-surface-container-high transition-colors duration-200 rounded" href="#">
-            <span className="material-symbols-outlined">military_tech</span>
-            <span className="font-label-md text-[14px]">Recompensas</span>
-          </a>
-          <a className="flex items-center gap-4 text-on-surface-variant hover:text-primary px-4 py-2 hover:bg-surface-container-high transition-colors duration-200 rounded mt-auto mb-6" href="#">
-            <span className="material-symbols-outlined">settings</span>
-            <span className="font-label-md text-[14px]">Configuración</span>
-          </a>
-          <button className="w-full py-2 px-4 bg-transparent border border-custom-border text-primary font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200 rounded">
-            Mejorar Plan
-          </button>
-        </div>
-      </nav>
+      <CommandSidebar currentPage="detail" onNavigate={(page) => page === 'catalog' ? onBack() : onNavigate?.('checkout')} className="h-screen sticky top-0" />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col md:flex-row min-h-screen">
@@ -152,7 +117,7 @@ export function ProductDetailPage({ productId, onBack, onNavigate }: Props) {
                 <CartSidebar onNavigateToCheckout={() => onNavigate?.('checkout')} />
               </div>
 
-              {/* Columna Derecha: Info, Acordeones */}
+              {/* Columna Derecha - Info, Acordeones */}
               <div className="flex flex-col">
                 <ProductInfo
                   product={product}

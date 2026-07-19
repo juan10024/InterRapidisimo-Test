@@ -125,7 +125,7 @@ export function CartView({ onNext, cartItems, subtotal, shippingFee, total }: Ca
           <span className="font-price-display font-semibold">${subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between items-center font-body-md text-body-md text-on-surface-variant">
-          <span>Tarifa de Enrutamiento</span>
+          <span>Tarifa de Envío</span>
           <span className="font-price-display font-semibold">${shippingFee.toFixed(2)}</span>
         </div>
         <div className="h-px w-full bg-outline-variant my-xs" />

@@ -7,6 +7,7 @@ import { Preloader } from './presentation/components/Preloader'
 import { Background } from './presentation/components/Background'
 import { CheckoutPage } from './presentation/pages/Checkout'
 import { Toast } from './presentation/components/Toast'
+import { PointsGainCelebration } from './presentation/components/PointsGainCelebration'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +39,7 @@ function App() {
       <Background />
       {/* Toast global — flotante sobre todas las páginas */}
       <Toast />
+      <PointsGainCelebration />
 
       {/* Contenedor relativo para asegurar que el contenido se superponga al fondo */}
       <div className="relative z-10">

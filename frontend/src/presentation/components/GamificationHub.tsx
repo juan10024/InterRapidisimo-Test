@@ -23,7 +23,7 @@ export function GamificationHub() {
           <div className="font-display-lg text-[48px] font-bold text-primary tracking-tighter leading-[1.1]" style={{ textShadow: '0 0 10px rgba(0, 229, 163, 0.3)' }}>
             {points} PTS
           </div>
-          <div className="font-label-sm text-[12px] text-on-surface-variant uppercase tracking-widest mt-1">Saldo Actual</div>
+          <div className="font-label-sm text-[12px] text-on-surface-variant uppercase tracking-widest mt-1">Puntuación Actual</div>
         </div>
 
         {isLoadingUser && (

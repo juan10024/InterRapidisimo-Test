@@ -11,14 +11,69 @@ import { CartView } from './components/CartView';
 import { ShippingView } from './components/ShippingView';
 import { PaymentView } from './components/PaymentView';
 import { TelemetryHub } from './components/TelemetryHub';
+import { CommandSidebar } from '../../components/CommandSidebar';
+import { SaleCompletionOverlay } from '../../components/SaleCompletionOverlay';
 
 interface Props {
   onNavigate?: (page: 'catalog' | 'detail' | 'checkout', productId?: string | null) => void;
 }
 
+export interface ShippingFormValues {
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  postalCode: string;
+}
+
+export interface PaymentFormValues {
+  cardNumber: string;
+  expiry: string;
+  cvc: string;
+  cardholderName: string;
+}
+
+export type FormErrors<T> = Partial<Record<keyof T, string>>;
+
+const initialShippingForm: ShippingFormValues = {
+  firstName: '', lastName: '', address: '', city: '', postalCode: '',
+};
+
+const initialPaymentForm: PaymentFormValues = {
+  cardNumber: '', expiry: '', cvc: '', cardholderName: '',
+};
+
+const validateShipping = (form: ShippingFormValues): FormErrors<ShippingFormValues> => ({
+  ...(!form.firstName.trim() && { firstName: 'Ingresa tu nombre.' }),
+  ...(!form.lastName.trim() && { lastName: 'Ingresa tu apellido.' }),
+  ...(!form.address.trim() && { address: 'Ingresa la dirección de entrega.' }),
+  ...(!form.city.trim() && { city: 'Ingresa la ciudad.' }),
+  ...(!/^\d{6}$/.test(form.postalCode) && { postalCode: 'El código postal debe tener 6 dígitos.' }),
+});
+
+const validatePayment = (form: PaymentFormValues): FormErrors<PaymentFormValues> => {
+  const errors: FormErrors<PaymentFormValues> = {};
+  const [month, year] = form.expiry.split('/').map(Number);
+  const expiryDate = new Date(2000 + year, month, 0);
+  const today = new Date();
+
+  if (!/^\d{16}$/.test(form.cardNumber)) errors.cardNumber = 'Ingresa los 16 dígitos de la tarjeta.';
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(form.expiry) || expiryDate < new Date(today.getFullYear(), today.getMonth(), 1)) {
+    errors.expiry = 'Usa una fecha vigente con formato MM/AA.';
+  }
+  if (!/^\d{3,4}$/.test(form.cvc)) errors.cvc = 'El CVC debe tener 3 o 4 dígitos.';
+  if (!form.cardholderName.trim()) errors.cardholderName = 'Ingresa el nombre del titular.';
+  return errors;
+};
+
 export function CheckoutPage({ onNavigate }: Props) {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'quantum'>('standard');
+  const [shippingForm, setShippingForm] = useState<ShippingFormValues>(initialShippingForm);
+  const [shippingErrors, setShippingErrors] = useState<FormErrors<ShippingFormValues>>({});
+  const [paymentForm, setPaymentForm] = useState<PaymentFormValues>(initialPaymentForm);
+  const [paymentErrors, setPaymentErrors] = useState<FormErrors<PaymentFormValues>>({});
+  const [isSaleComplete, setIsSaleComplete] = useState(false);
 
   const cartItems = useCartStore(state => state.cartItems);
   const checkoutCart = useCartStore(state => state.checkoutCart);
@@ -29,62 +84,41 @@ export function CheckoutPage({ onNavigate }: Props) {
   const shippingFee = shippingMethod === 'standard' ? 15.00 : 45.00;
   const total = subtotal + shippingFee;
 
+  const handleShippingNext = () => {
+    const errors = validateShipping(shippingForm);
+    setShippingErrors(errors);
+    if (Object.keys(errors).length === 0) setCurrentStep(3);
+  };
+
   const handleFinalizeOrder = async () => {
     if (cartItems.length === 0) {
       alert('El cargamento está vacío. Agrega productos antes de autorizar la transferencia.');
       return;
     }
+    const errors = validatePayment(paymentForm);
+    setPaymentErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
     // La orquestación de recompensas y limpieza del carrito ocurre en la capa de Application
     const completed = await checkoutCart();
     if (!completed) {
       alert('No se puede completar la compra hasta cargar el perfil de usuario.');
       return;
     }
-    alert('¡Compra exitosa! Tu perfil ha sido actualizado.');
-    onNavigate?.('catalog');
+    setIsSaleComplete(true);
   };
 
   return (
-    <div className="bg-background text-on-surface h-screen w-full flex overflow-hidden selection:bg-primary selection:text-on-primary-fixed">
+    <div className="bg-surface-container-lowest text-on-surface h-screen w-full flex overflow-hidden selection:bg-primary selection:text-on-primary-container">
+      {isSaleComplete && (
+        <SaleCompletionOverlay onComplete={() => {
+          setIsSaleComplete(false);
+          onNavigate?.('catalog');
+        }} />
+      )}
 
       {/* Sidebar — Centro de Comando */}
-      <aside className="h-screen w-64 border-r border-outline-variant bg-surface flex flex-col py-md px-sm md:flex shrink-0">
-        <div className="mb-xl px-sm">
-          <h1 className="font-display-lg text-[22px] text-primary uppercase tracking-tighter font-bold">Centro de Comando</h1>
-          <p className="font-label-sm text-label-sm text-on-surface-variant mt-xs">Rango Élite</p>
-        </div>
-        <nav className="flex-1 space-y-xs">
-          <a onClick={() => onNavigate?.('catalog')} className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs hover:bg-surface-container-high transition-colors duration-200 group cursor-pointer">
-            <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">grid_view</span>
-            <span className="font-label-md text-label-md">Panel de Control</span>
-          </a>
-          <a onClick={() => onNavigate?.('catalog')} className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs hover:bg-surface-container-high transition-colors duration-200 group cursor-pointer">
-            <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">shopping_bag</span>
-            <span className="font-label-md text-label-md">Catálogo</span>
-          </a>
-          <a className="flex items-center gap-sm bg-primary-container text-on-primary-container border-r-4 border-primary px-sm py-xs group rounded" href="#">
-            <span className="material-symbols-outlined translate-x-1 transition-transform duration-200" style={{ fontVariationSettings: "'FILL' 1" }}>shopping_cart</span>
-            <span className="font-label-md text-label-md font-bold">Carrito y Pago</span>
-          </a>
-          <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs hover:bg-surface-container-high transition-colors duration-200 group" href="#">
-            <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">receipt_long</span>
-            <span className="font-label-md text-label-md">Pedidos</span>
-          </a>
-          <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs hover:bg-surface-container-high transition-colors duration-200 group" href="#">
-            <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">inventory_2</span>
-            <span className="font-label-md text-label-md">Inventario</span>
-          </a>
-          <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs hover:bg-surface-container-high transition-colors duration-200 group" href="#">
-            <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">military_tech</span>
-            <span className="font-label-md text-label-md">Recompensas</span>
-          </a>
-        </nav>
-        <div className="mt-auto pt-md">
-          <button className="w-full py-xs px-sm border border-outline-variant text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors hover:-translate-y-0.5 hover:-translate-x-0.5 active:translate-y-0 active:translate-x-0 active:shadow-none flex items-center justify-center gap-xs">
-            Mejorar Plan
-          </button>
-        </div>
-      </aside>
+      <CommandSidebar currentPage="checkout" onNavigate={(page) => onNavigate?.(page)} className="h-screen sticky top-0" />
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
@@ -133,13 +167,29 @@ export function CheckoutPage({ onNavigate }: Props) {
             )}
             {currentStep === 2 && (
               <ShippingView
-                onNext={() => setCurrentStep(3)}
+                onNext={handleShippingNext}
                 shippingMethod={shippingMethod}
                 setShippingMethod={setShippingMethod}
+                form={shippingForm}
+                errors={shippingErrors}
+                onChange={(field, value) => {
+                  setShippingForm(current => ({ ...current, [field]: value }));
+                  setShippingErrors(current => ({ ...current, [field]: undefined }));
+                }}
               />
             )}
             {currentStep === 3 && (
-              <PaymentView onComplete={handleFinalizeOrder} total={total} disabled={!isUserReady} />
+              <PaymentView
+                onComplete={handleFinalizeOrder}
+                total={total}
+                disabled={!isUserReady}
+                form={paymentForm}
+                errors={paymentErrors}
+                onChange={(field, value) => {
+                  setPaymentForm(current => ({ ...current, [field]: value }));
+                  setPaymentErrors(current => ({ ...current, [field]: undefined }));
+                }}
+              />
             )}
           </div>
           <TelemetryHub />

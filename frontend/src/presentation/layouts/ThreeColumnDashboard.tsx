@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useProductStore } from '../../application/store/useProductStore';
 import { ProductCard } from '../components/ProductCard';
 import { GamificationHub } from '../components/GamificationHub';
+import { CommandSidebar } from '../components/CommandSidebar';
 
 import { useCartStore } from '../../application/store/useCartStore';
 
@@ -76,35 +77,7 @@ export function ThreeColumnDashboard({ onSelectProduct, onNavigate }: Props) {
 
       <div className="flex flex-1 overflow-hidden">
         {/* SideNavBar - Centro de Comando */}
-        <aside className="w-64 h-full border-r border-outline-variant bg-surface hidden md:flex flex-col py-md px-sm">
-          <div className="mb-lg px-sm">
-            <h2 className="font-display-lg text-[18px] font-bold text-primary">Centro de Comando</h2>
-            <p className="font-label-sm text-[12px] text-on-surface-variant mt-1">Rango Élite</p>
-          </div>
-          <nav className="flex-1 flex flex-col gap-1">
-            <a onClick={() => onNavigate?.('catalog')} className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200 cursor-pointer">
-              <span className="material-symbols-outlined">grid_view</span> Panel de Control
-            </a>
-            <a onClick={() => onNavigate?.('catalog')} className="flex items-center gap-sm bg-primary-container text-on-primary-container border-r-4 border-primary px-sm py-xs font-label-md text-[14px] translate-x-1 transition-transform duration-200 cursor-pointer">
-              <span className="material-symbols-outlined material-symbols-fill">shopping_bag</span> Catálogo
-            </a>
-            <a onClick={() => onNavigate?.('checkout')} className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200 cursor-pointer">
-              <span className="material-symbols-outlined">receipt_long</span> Pedidos
-            </a>
-            <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200" href="#">
-              <span className="material-symbols-outlined">inventory_2</span> Inventario
-            </a>
-            <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200" href="#">
-              <span className="material-symbols-outlined">military_tech</span> Recompensas
-            </a>
-            <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200" href="#">
-              <span className="material-symbols-outlined">settings</span> Configuración
-            </a>
-          </nav>
-          <div className="mt-auto px-sm pt-md">
-            <button className="w-full bg-transparent border border-custom-border text-primary font-label-md text-[14px] py-xs rounded hover:border-primary transition-colors">Mejorar Plan</button>
-          </div>
-        </aside>
+        <CommandSidebar currentPage="catalog" onNavigate={(page) => onNavigate?.(page)} className="h-[calc(100vh-57px)] sticky top-14.25" />
 
         {/* Main Content Workspace */}
         <main className="flex-1 overflow-y-auto p-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-lg">
