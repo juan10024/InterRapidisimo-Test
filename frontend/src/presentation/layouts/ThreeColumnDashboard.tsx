@@ -7,12 +7,16 @@ import { useProductStore } from '../../application/store/useProductStore';
 import { ProductCard } from '../components/ProductCard';
 import { GamificationHub } from '../components/GamificationHub';
 
+import { useCartStore } from '../../application/store/useCartStore';
+
 interface Props {
   onSelectProduct: (productId: string) => void;
+  onNavigate?: (page: 'catalog' | 'detail' | 'checkout', productId?: string | null) => void;
 }
 
-export function ThreeColumnDashboard({ onSelectProduct }: Props) {
+export function ThreeColumnDashboard({ onSelectProduct, onNavigate }: Props) {
   const { products, isLoading, fetchProducts } = useProductStore();
+  const cartItems = useCartStore(state => state.cartItems);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
@@ -44,6 +48,19 @@ export function ThreeColumnDashboard({ onSelectProduct }: Props) {
           </nav>
         </div>
         <div className="flex items-center gap-md">
+          {/* Botón de Carrito con indicador */}
+          <button 
+            onClick={() => onNavigate?.('checkout')}
+            className="text-on-surface-variant hover:text-primary transition-colors relative flex items-center justify-center p-1 mr-1"
+            title="Ver cargamento de compra"
+          >
+            <span className="material-symbols-outlined">shopping_cart</span>
+            {cartItems.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-primary text-black font-bold font-label-sm text-[10px] w-4 h-4 rounded-full flex items-center justify-center border border-surface">
+                {cartItems.reduce((acc, item) => acc + item.quantity, 0)}
+              </span>
+            )}
+          </button>
           <button className="text-on-surface-variant hover:text-primary transition-colors">
             <span className="material-symbols-outlined">notifications</span>
           </button>
@@ -65,13 +82,13 @@ export function ThreeColumnDashboard({ onSelectProduct }: Props) {
             <p className="font-label-sm text-[12px] text-on-surface-variant mt-1">Rango Élite</p>
           </div>
           <nav className="flex-1 flex flex-col gap-1">
-            <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200" href="#">
+            <a onClick={() => onNavigate?.('catalog')} className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200 cursor-pointer">
               <span className="material-symbols-outlined">grid_view</span> Panel de Control
             </a>
-            <a className="flex items-center gap-sm bg-primary-container text-on-primary-container border-r-4 border-primary px-sm py-xs font-label-md text-[14px] translate-x-1 transition-transform duration-200" href="#">
+            <a onClick={() => onNavigate?.('catalog')} className="flex items-center gap-sm bg-primary-container text-on-primary-container border-r-4 border-primary px-sm py-xs font-label-md text-[14px] translate-x-1 transition-transform duration-200 cursor-pointer">
               <span className="material-symbols-outlined material-symbols-fill">shopping_bag</span> Catálogo
             </a>
-            <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200" href="#">
+            <a onClick={() => onNavigate?.('checkout')} className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200 cursor-pointer">
               <span className="material-symbols-outlined">receipt_long</span> Pedidos
             </a>
             <a className="flex items-center gap-sm text-on-surface-variant hover:text-primary px-sm py-xs font-label-md text-[14px] hover:bg-surface-container-high transition-colors duration-200" href="#">

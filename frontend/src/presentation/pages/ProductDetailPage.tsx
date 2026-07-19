@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUserStore } from '../../application/store/useUserStore';
+import { useCartStore } from '../../application/store/useCartStore';
 import { apiClient } from '../../infrastructure/api/apiClient';
 import type { Product } from '../../domain/models';
 
@@ -7,9 +8,10 @@ interface Props {
   productId: string;
   onBack: () => void;
   onSelectProduct?: (productId: string) => void;
+  onNavigate?: (page: 'catalog' | 'detail' | 'checkout', productId?: string | null) => void;
 }
 
-export function ProductDetailPage({ productId, onBack, onSelectProduct }: Props) {
+export function ProductDetailPage({ productId, onBack, onSelectProduct, onNavigate }: Props) {
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(0);
   const [product, setProduct] = useState<Product | null>(null);
@@ -17,8 +19,21 @@ export function ProductDetailPage({ productId, onBack, onSelectProduct }: Props)
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  // Estados locales para el Toast Notification
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
   const triggerRewardAction = useUserStore(state => state.triggerRewardAction);
   const isProcessing = useUserStore(state => state.isProcessingReward);
+
+  // Zustand Store de Carrito y Wishlist
+  const cartItems = useCartStore(state => state.cartItems);
+  const wishlist = useCartStore(state => state.wishlist);
+  const toggleWishlist = useCartStore(state => state.toggleWishlist);
+  const addToCart = useCartStore(state => state.addToCart);
+  const removeFromCart = useCartStore(state => state.removeFromCart);
+
+  const isWishlisted = product ? wishlist.some(p => p.id === product.id) : false;
 
   useEffect(() => {
     setIsLoadingProduct(true);
@@ -55,7 +70,18 @@ export function ProductDetailPage({ productId, onBack, onSelectProduct }: Props)
 
   const handleBuy = () => {
     if (!product) return;
-    triggerRewardAction(product.id, "PURCHASE", `Compró ${product.name.split(' ')[0]}`);
+    addToCart(product, quantity);
+    setToastMessage(`Añadido: ${product.name} (x${quantity}) al cargamento de compra.`);
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3500);
+  };
+
+  const handleFavorite = () => {
+    if (product) {
+      toggleWishlist(product);
+    }
   };
 
   const isLowStock = product ? product.stock <= 10 : false;
@@ -82,7 +108,7 @@ export function ProductDetailPage({ productId, onBack, onSelectProduct }: Props)
             <span className="material-symbols-outlined">grid_view</span>
             <span className="font-label-md text-[14px]">Panel de Control</span>
           </a>
-          <a className="flex items-center gap-4 bg-primary-container text-on-primary-container border-r-4 border-primary px-4 py-2 translate-x-1 transition-transform duration-200 rounded" href="#">
+          <a onClick={onBack} className="flex items-center gap-4 bg-primary-container text-on-primary-container border-r-4 border-primary px-4 py-2 translate-x-1 transition-transform duration-200 rounded cursor-pointer">
             <span className="material-symbols-outlined material-symbols-fill">shopping_bag</span>
             <span className="font-label-md text-[14px] font-bold">Catálogo</span>
           </a>
@@ -138,14 +164,16 @@ export function ProductDetailPage({ productId, onBack, onSelectProduct }: Props)
 
           {product && !isLoadingProduct && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-              {/* Columna Izquierda: Galería */}
-              <div className="flex flex-col gap-4">
+              {/* Columna Izquierda: Galería y Carrito */}
+              <div className="flex flex-col gap-6">
+                {/* Galería */}
                 <div className="bg-custom-card border border-custom-border rounded-lg aspect-square overflow-hidden relative group cursor-crosshair hard-shadow">
                   <img alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src={product.imageUrl} />
                   <div className="absolute top-4 right-4 bg-custom-bg/80 backdrop-blur-sm px-2 py-1 rounded border border-custom-border font-label-sm text-[12px] text-primary flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px]">view_in_ar</span> 3D
                   </div>
                 </div>
+                {/* Miniaturas */}
                 <div className="grid grid-cols-4 gap-4">
                   <button className="bg-custom-card border border-primary rounded-lg aspect-square overflow-hidden">
                     <img alt="Vista principal" className="w-full h-full object-cover" src={product.imageUrl} />
@@ -160,6 +188,53 @@ export function ProductDetailPage({ productId, onBack, onSelectProduct }: Props)
                     <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">play_circle</span>
                   </button>
                 </div>
+
+                {/* Carrito de Compra */}
+                <div className="bg-custom-card border border-custom-border rounded-lg p-5 hard-shadow mt-2">
+                  <h4 className="font-display-lg text-[18px] font-bold text-primary mb-3 flex items-center gap-2 uppercase tracking-tight">
+                    <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    Cargamento de Compra
+                  </h4>
+                  {cartItems.length === 0 ? (
+                    <p className="font-label-md text-[14px] text-on-surface-variant italic">El carrito de compras está vacío.</p>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      <div className="max-h-60 overflow-y-auto flex flex-col gap-2 pr-1">
+                        {cartItems.map((item) => (
+                          <div key={item.product.id} className="flex justify-between items-center bg-custom-bg p-2 rounded border border-custom-border text-on-surface-variant font-label-md text-[13px] gap-2">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <img className="w-8 h-8 object-cover rounded border border-custom-border shrink-0" src={item.product.imageUrl} alt={item.product.name} />
+                              <span className="truncate text-on-surface font-semibold">{item.product.name}</span>
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="text-on-surface-variant">x{item.quantity}</span>
+                              <span className="text-primary font-bold">${(item.product.price * item.quantity).toFixed(2)}</span>
+                              <button 
+                                onClick={() => removeFromCart(item.product.id)} 
+                                className="text-custom-error hover:text-red-500 transition-colors"
+                                title="Eliminar ítem"
+                              >
+                                <span className="material-symbols-outlined text-[16px] flex items-center">delete</span>
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="h-px bg-custom-border"></div>
+                      <div className="flex justify-between items-center font-label-md text-[14px] text-on-surface-variant">
+                        <span>Total del Cargamento:</span>
+                        <span className="font-bold text-primary text-[18px]">${cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0).toFixed(2)}</span>
+                      </div>
+                      <button 
+                        onClick={() => onNavigate?.('checkout')}
+                        className="w-full py-3 bg-primary text-black font-bold font-display-lg text-[16px] uppercase tracking-wider rounded hover:bg-primary-container transition-all hover:-translate-y-0.5 hover:-translate-x-0.5 active:translate-y-0 active:translate-x-0 active:shadow-none flex items-center justify-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
+                        Proceder al Pago
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Columna Derecha: Detalles */}
@@ -168,8 +243,18 @@ export function ProductDetailPage({ productId, onBack, onSelectProduct }: Props)
                   <div className="flex justify-between items-start mb-2">
                     <h2 className="font-display-lg text-[32px] md:text-[48px] text-on-surface font-bold tracking-tight leading-none">{product.name}</h2>
                     <div className="flex gap-2">
-                      <button className="w-10 h-10 flex items-center justify-center rounded-full bg-custom-bg border border-custom-border hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-primary">
-                        <span className="material-symbols-outlined text-[20px]">favorite_border</span>
+                      <button 
+                        onClick={handleFavorite}
+                        disabled={isProcessing}
+                        className={`w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-200 ${
+                          isWishlisted 
+                            ? 'bg-primary/20 border-primary text-primary' 
+                            : 'bg-custom-bg border-custom-border hover:bg-surface-container-high text-on-surface-variant hover:text-primary'
+                        }`}
+                      >
+                        <span className={`material-symbols-outlined text-[20px] ${isWishlisted ? 'material-symbols-fill' : ''}`}>
+                          favorite
+                        </span>
                       </button>
                       <button className="w-10 h-10 flex items-center justify-center rounded-full bg-custom-bg border border-custom-border hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-primary">
                         <span className="material-symbols-outlined text-[20px]">share</span>
@@ -377,6 +462,22 @@ export function ProductDetailPage({ productId, onBack, onSelectProduct }: Props)
         </a>
       </nav>
       <div className="md:hidden h-18"></div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-20 md:bottom-6 right-6 z-9999 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-surface border border-primary text-on-surface p-4 rounded-lg hard-shadow shadow-[6px_6px_0px_rgba(0,229,163,0.3)] flex items-center gap-3">
+            <span className="material-symbols-outlined text-primary text-[24px]">check_circle</span>
+            <div className="flex flex-col">
+              <span className="font-label-md text-[14px] font-bold text-primary uppercase tracking-wider">Cargamento Actualizado</span>
+              <span className="font-body-sm text-[12px] text-on-surface-variant">{toastMessage}</span>
+            </div>
+            <button onClick={() => setShowToast(false)} className="text-on-surface-variant hover:text-primary transition-colors ml-2">
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

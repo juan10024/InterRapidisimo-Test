@@ -4,9 +4,11 @@ import { ThreeColumnDashboard } from './presentation/layouts/ThreeColumnDashboar
 import { ProductDetailPage } from './presentation/pages/ProductDetailPage'
 import { Preloader } from './presentation/components/Preloader'
 import { Background } from './presentation/components/Background'
+import { CheckoutPage } from './presentation/pages/CheckoutPage'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState<'catalog' | 'detail' | 'checkout'>('catalog');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   // Mientras carga, mostrar el preloader
@@ -14,20 +16,39 @@ function App() {
     return <Preloader onComplete={() => setIsLoading(false)} />;
   }
 
+  const handleNavigate = (page: 'catalog' | 'detail' | 'checkout', prodId?: string | null) => {
+    if (page === 'detail' && prodId) {
+      setSelectedProductId(prodId);
+    } else if (page === 'catalog') {
+      setSelectedProductId(null);
+    }
+    setCurrentPage(page);
+  };
+
   // Una vez cargado, renderizar el fondo y el enrutamiento lógico
   return (
     <>
       <Background />
-      
+
       {/* Contenedor relativo para asegurar que el contenido se superponga al fondo */}
       <div className="relative z-10">
-        {selectedProductId
-          ? <ProductDetailPage productId={selectedProductId} onBack={() => setSelectedProductId(null)} onSelectProduct={setSelectedProductId} />
-          : <ThreeColumnDashboard onSelectProduct={setSelectedProductId} />
-        }
+        {currentPage === 'checkout' ? (
+          <CheckoutPage onNavigate={handleNavigate} />
+        ) : currentPage === 'detail' && selectedProductId ? (
+          <ProductDetailPage 
+            productId={selectedProductId} 
+            onBack={() => handleNavigate('catalog')} 
+            onNavigate={handleNavigate} 
+          />
+        ) : (
+          <ThreeColumnDashboard 
+            onSelectProduct={(id) => handleNavigate('detail', id)} 
+            onNavigate={handleNavigate} 
+          />
+        )}
       </div>
     </>
-  )
+  );
 }
 
 export default App

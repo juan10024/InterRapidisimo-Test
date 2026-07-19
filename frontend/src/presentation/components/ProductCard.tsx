@@ -2,8 +2,8 @@
  * descripcion: Este archivo contiene el componente de tarjeta de producto
  */
 
-import { useState } from 'react';
 import { useUserStore } from '../../application/store/useUserStore';
+import { useCartStore } from '../../application/store/useCartStore';
 import type { Product } from '../../domain/models';
 
 interface Props {
@@ -12,19 +12,19 @@ interface Props {
 }
 
 export function ProductCard({ product, onSelect }: Props) {
-  const triggerRewardAction = useUserStore(state => state.triggerRewardAction);
   const isProcessing = useUserStore(state => state.isProcessingReward);
-  const [isFavorited, setIsFavorited] = useState(false);
+  const wishlist = useCartStore(state => state.wishlist);
+  const toggleWishlist = useCartStore(state => state.toggleWishlist);
+  const addToCart = useCartStore(state => state.addToCart);
+
+  const isFavorited = wishlist.some(p => p.id === product.id);
 
   const handleAdd = () => {
-    triggerRewardAction(product.id, "ADD_TO_CART", `Agregó ${product.name.split(' ')[0]}`);
+    addToCart(product, 1);
   };
 
   const handleFavorite = () => {
-    if (!isFavorited) { 
-      triggerRewardAction(product.id, "FAVORITE", `Marcó como favorito ${product.name.split(' ')[0]}`);
-    }
-    setIsFavorited(prev => !prev);
+    toggleWishlist(product);
   };
 
   return (
