@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  /* Paleta de colores */
+  --color-obsidian: #0F1115;
+  --color-graphite: #161920;
+  --color-border-subtle: #242936;
+  --color-esmeralda: #00E5A3;
+  --color-coral: #FF4B5C;
+
+  /* Tipografías seleccionadas */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+}
+
+body {
+  background-color: var(--color-obsidian);
+  color: #F3F4F6;
+  font-family: var(--font-sans);
+}
