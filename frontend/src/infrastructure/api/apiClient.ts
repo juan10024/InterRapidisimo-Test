@@ -18,8 +18,21 @@ export const apiClient = {
   /*
    * Obtiene la lista paginada de productos del backend.
    */
-  async getProducts(page: number = 1, limit: number = 4): Promise<PaginatedProductsResponse> {
-    const response = await fetch(`${API_BASE_URL}/products?page=${page}&limit=${limit}`, {
+  async getProducts(
+    page: number = 1,
+    limit: number = 4,
+    category?: string,
+    search?: string
+  ): Promise<PaginatedProductsResponse> {
+    let url = `${API_BASE_URL}/products?page=${page}&limit=${limit}`;
+    if (category) {
+      url += `&category=${encodeURIComponent(category)}`;
+    }
+    if (search) {
+      url += `&search=${encodeURIComponent(search)}`;
+    }
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',

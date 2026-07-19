@@ -11,7 +11,7 @@ interface ProductState {
   meta: PaginationMeta | null;
   isLoading: boolean;
   error: string | null;
-  fetchProducts: (page?: number, limit?: number) => Promise<void>;
+  fetchProducts: (page?: number, limit?: number, category?: string, search?: string) => Promise<void>;
 }
 
 export const useProductStore = create<ProductState>((set) => ({
@@ -20,10 +20,10 @@ export const useProductStore = create<ProductState>((set) => ({
   isLoading: false,
   error: null,
   
-  fetchProducts: async (page = 1, limit = 4) => {
+  fetchProducts: async (page = 1, limit = 4, category, search) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await apiClient.getProducts(page, limit);
+      const response = await apiClient.getProducts(page, limit, category, search);
       set({ 
         products: response.data.products, 
         meta: response.data.meta,

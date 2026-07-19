@@ -35,7 +35,7 @@ export const PaginatedProductsResponseSchema = z.object({
 export const RewardActionRequestSchema = z.object({
   userId: z.string().uuid(),
   productId: z.string().uuid(),
-  actionType: z.enum(["ADD_TO_CART", "PURCHASE", "DAILY_LOGIN", "SHARE"])
+  actionType: z.enum(["ADD_TO_CART", "PURCHASE", "FAVORITE"])
 });
 
 export const RewardActionResponseSchema = z.object({

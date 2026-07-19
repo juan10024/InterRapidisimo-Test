@@ -53,7 +53,10 @@ export const useUserStore = create<UserState>((set, get) => ({
             id: Date.now().toString(), 
             description, 
             points: response.data.pointsAwarded,
-            icon: actionType === 'ADD_TO_CART' ? 'shopping_bag' : 'local_fire_department'
+            icon: actionType === 'ADD_TO_CART' ? 'shopping_bag'
+                : actionType === 'FAVORITE'   ? 'favorite'
+                : actionType === 'PURCHASE'   ? 'receipt_long'
+                : 'local_fire_department'
           },
           ...state.activities
         ],

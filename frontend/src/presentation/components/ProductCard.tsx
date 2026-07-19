@@ -2,6 +2,7 @@
  * descripcion: Este archivo contiene el componente de tarjeta de producto
  */
 
+import { useState } from 'react';
 import { useUserStore } from '../../application/store/useUserStore';
 import type { Product } from '../../domain/models';
 
@@ -12,9 +13,17 @@ interface Props {
 export function ProductCard({ product }: Props) {
   const triggerRewardAction = useUserStore(state => state.triggerRewardAction);
   const isProcessing = useUserStore(state => state.isProcessingReward);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   const handleAdd = () => {
     triggerRewardAction(product.id, "ADD_TO_CART", `Agregó ${product.name.split(' ')[0]}`);
+  };
+
+  const handleFavorite = () => {
+    if (!isFavorited) { 
+      triggerRewardAction(product.id, "FAVORITE", `Marcó como favorito ${product.name.split(' ')[0]}`);
+    }
+    setIsFavorited(prev => !prev);
   };
 
   return (
@@ -25,6 +34,21 @@ export function ProductCard({ product }: Props) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
           src={product.imageUrl} 
         />
+        {/* Botón de favorito sobre la imagen */}
+        <button
+          onClick={handleFavorite}
+          disabled={isProcessing}
+          title={isFavorited ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+          className={`absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-full border transition-all duration-200 ${
+            isFavorited
+              ? 'bg-primary/20 border-primary text-primary'
+              : 'bg-custom-bg/60 border-custom-border text-on-surface-variant hover:border-primary hover:text-primary'
+          }`}
+        >
+          <span className={`material-symbols-outlined text-[16px]! ${isFavorited ? 'material-symbols-fill' : ''}`}>
+            favorite
+          </span>
+        </button>
         {product.stock <= 10 ? (
           <div className="absolute top-2 right-2 bg-custom-error text-white border border-custom-error px-2 py-1 rounded font-label-sm text-[12px]">Bajo Stock</div>
         ) : (

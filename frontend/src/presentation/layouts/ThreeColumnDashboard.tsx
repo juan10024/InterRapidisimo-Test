@@ -2,17 +2,30 @@
  * descripcion: Este archivo contiene el componente de layout de tres columnas para el dashboard
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useProductStore } from '../../application/store/useProductStore';
 import { ProductCard } from '../components/ProductCard';
 import { GamificationHub } from '../components/GamificationHub';
 
 export function ThreeColumnDashboard() {
   const { products, isLoading, fetchProducts } = useProductStore();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
 
   useEffect(() => {
-    fetchProducts(1, 4);
-  }, [fetchProducts]);
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  useEffect(() => {
+    fetchProducts(1, 4, selectedCategory || undefined, debouncedSearchQuery || undefined);
+  }, [fetchProducts, selectedCategory, debouncedSearchQuery]);
 
   return (
     <>
@@ -79,15 +92,41 @@ export function ThreeColumnDashboard() {
           <div className="lg:col-span-3 flex flex-col gap-md">
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-              <input className="search-input" placeholder="Buscar en el catálogo..." type="text" />
+              <input 
+                className="search-input" 
+                placeholder="Buscar en el catálogo..." 
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
             <div className="bg-custom-card border border-custom-border rounded-lg p-sm">
               <h3 className="font-display-lg text-[18px] font-bold mb-sm">Categorías</h3>
               <div className="flex flex-wrap gap-2">
-                <button className="active-chip font-label-md text-[12px] px-3 py-1 rounded border border-transparent transition-colors">Todos</button>
-                <button className="inactive-chip font-label-md text-[12px] px-3 py-1 rounded border border-custom-border hover:border-primary transition-colors">Periféricos</button>
-                <button className="inactive-chip font-label-md text-[12px] px-3 py-1 rounded border border-custom-border hover:border-primary transition-colors">Pantallas</button>
-                <button className="inactive-chip font-label-md text-[12px] px-3 py-1 rounded border border-custom-border hover:border-primary transition-colors">Muebles</button>
+                <button 
+                  onClick={() => setSelectedCategory(null)}
+                  className={`${selectedCategory === null ? 'active-chip border-transparent' : 'inactive-chip border-custom-border hover:border-primary'} font-label-md text-[12px] px-3 py-1 rounded border transition-colors`}
+                >
+                  Todos
+                </button>
+                <button 
+                  onClick={() => setSelectedCategory('perifericos')}
+                  className={`${selectedCategory === 'perifericos' ? 'active-chip border-transparent' : 'inactive-chip border-custom-border hover:border-primary'} font-label-md text-[12px] px-3 py-1 rounded border transition-colors`}
+                >
+                  Periféricos
+                </button>
+                <button 
+                  onClick={() => setSelectedCategory('pantallas')}
+                  className={`${selectedCategory === 'pantallas' ? 'active-chip border-transparent' : 'inactive-chip border-custom-border hover:border-primary'} font-label-md text-[12px] px-3 py-1 rounded border transition-colors`}
+                >
+                  Pantallas
+                </button>
+                <button 
+                  onClick={() => setSelectedCategory('muebles')}
+                  className={`${selectedCategory === 'muebles' ? 'active-chip border-transparent' : 'inactive-chip border-custom-border hover:border-primary'} font-label-md text-[12px] px-3 py-1 rounded border transition-colors`}
+                >
+                  Muebles
+                </button>
               </div>
             </div>
           </div>
