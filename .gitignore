@@ -6,6 +6,8 @@ node_modules/
 *.env
 .env.*
 backend/.env.*
+!.env.example
+!**/.env.example
 
 # Carpetas de compilación 
 dist/

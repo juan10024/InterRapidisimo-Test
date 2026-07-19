@@ -14,28 +14,55 @@ interface Activity {
 }
 
 interface UserState {
-  userId: string;
+  userId: string | null;
   points: number;
-  level: number;
   activities: Activity[];
+  isLoadingUser: boolean;
+  userError: string | null;
   isProcessingReward: boolean;
+  loadCurrentUser: () => Promise<void>;
   triggerRewardAction: (productId: string, actionType: RewardActionRequest['actionType'], description: string) => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
-  // Datos hardcodeados para el MVP
-  userId: "550e8400-e29b-41d4-a716-446655440000",
-  points: 0, 
-  level: 1,
+  userId: null,
+  points: 0,
   // Actividades iniciales para poblar el UI basado en el diseño
   activities: [
     { id: 'evt-1', description: 'Inicio de Sesión Diario', points: 10, icon: 'military_tech' },
     { id: 'evt-2', description: 'Lista de Deseos Compartida', points: 25, icon: 'share' }
   ],
+  isLoadingUser: false,
+  userError: null,
   isProcessingReward: false,
+
+  loadCurrentUser: async () => {
+    if (get().isLoadingUser) {
+      return;
+    }
+
+    set({ isLoadingUser: true, userError: null });
+    try {
+      const response = await apiClient.getCurrentUser();
+      set({
+        userId: response.data.user.id,
+        points: response.data.user.pointsBalance,
+        isLoadingUser: false,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No fue posible cargar el perfil de usuario.';
+      console.error('Error al cargar el perfil de usuario:', error);
+      set({ userId: null, isLoadingUser: false, userError: message });
+    }
+  },
 
   triggerRewardAction: async (productId, actionType, description) => {
     const { userId } = get();
+    if (!userId) {
+      set({ userError: 'No se puede procesar una recompensa sin un perfil de usuario cargado.' });
+      return;
+    }
+
     set({ isProcessingReward: true });
     
     try {

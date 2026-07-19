@@ -35,13 +35,13 @@ app.use(errorHandler);
 // Inicializar la conexión a la base de datos antes de escuchar el puerto
 AppDataSource.initialize()
   .then(() => {
-    console.log('📦 Base de datos PostgreSQL conectada mediante TypeORM');
+    console.log('Base de datos PostgreSQL conectada mediante TypeORM');
     
     app.listen(env.PORT, () => {
-      console.log(`🚀 Servidor backend corriendo en http://localhost:${env.PORT} en modo [${env.NODE_ENV}]`);
+      console.log(`Servidor backend corriendo en http://localhost:${env.PORT} en modo [${env.NODE_ENV}]`);
     });
   })
   .catch((error) => {
-    console.error('❌ Error fatal al inicializar el Data Source de la base de datos:', error);
+    console.error('Error fatal al inicializar el Data Source de la base de datos:', error);
     process.exit(1);
   });

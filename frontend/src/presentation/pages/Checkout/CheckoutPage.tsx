@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useCartStore } from '../../../application/store/useCartStore';
+import { useUserStore } from '../../../application/store/useUserStore';
 import { CheckoutStepper } from './components/CheckoutStepper';
 import { CartView } from './components/CartView';
 import { ShippingView } from './components/ShippingView';
@@ -21,6 +22,7 @@ export function CheckoutPage({ onNavigate }: Props) {
 
   const cartItems = useCartStore(state => state.cartItems);
   const checkoutCart = useCartStore(state => state.checkoutCart);
+  const isUserReady = useUserStore(state => state.userId !== null);
 
   // Cálculos de presentación (precios, no reglas de negocio de recompensas)
   const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
@@ -33,7 +35,11 @@ export function CheckoutPage({ onNavigate }: Props) {
       return;
     }
     // La orquestación de recompensas y limpieza del carrito ocurre en la capa de Application
-    await checkoutCart();
+    const completed = await checkoutCart();
+    if (!completed) {
+      alert('No se puede completar la compra hasta cargar el perfil de usuario.');
+      return;
+    }
     alert('¡Compra exitosa! Tu perfil ha sido actualizado.');
     onNavigate?.('catalog');
   };
@@ -133,7 +139,7 @@ export function CheckoutPage({ onNavigate }: Props) {
               />
             )}
             {currentStep === 3 && (
-              <PaymentView onComplete={handleFinalizeOrder} total={total} />
+              <PaymentView onComplete={handleFinalizeOrder} total={total} disabled={!isUserReady} />
             )}
           </div>
           <TelemetryHub />

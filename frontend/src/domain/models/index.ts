@@ -9,6 +9,7 @@ import {
   PaginatedProductsResponseSchema,
   RewardActionRequestSchema,
   RewardActionResponseSchema,
+  CurrentUserResponseSchema,
   SingleProductResponseSchema
 } from '../schemas/apiSchemas';
 
@@ -19,5 +20,6 @@ export type PaginatedProductsResponse = z.infer<typeof PaginatedProductsResponse
 
 export type RewardActionRequest = z.infer<typeof RewardActionRequestSchema>;
 export type RewardActionResponse = z.infer<typeof RewardActionResponseSchema>;
+export type CurrentUserResponse = z.infer<typeof CurrentUserResponseSchema>;
 
 export type SingleProductResponse = z.infer<typeof SingleProductResponseSchema>;

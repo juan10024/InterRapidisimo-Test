@@ -5,18 +5,43 @@
 import { 
   PaginatedProductsResponseSchema, 
   RewardActionResponseSchema,
+  CurrentUserResponseSchema,
   SingleProductResponseSchema
 } from '../../domain/schemas/apiSchemas';
 import type { 
   PaginatedProductsResponse, 
   RewardActionRequest, 
   RewardActionResponse,
+  CurrentUserResponse,
   SingleProductResponse
 } from '../../domain/models';
 
-const API_BASE_URL = 'http://localhost:3000/api/v1';
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+if (!configuredApiBaseUrl) {
+  throw new Error('Falta configurar VITE_API_BASE_URL. Consulta frontend/.env.example.');
+}
+
+const API_BASE_URL = configuredApiBaseUrl.replace(/\/$/, '');
 
 export const apiClient = {
+  /*
+   * Obtiene el perfil del usuario demo activo en el entorno.
+   */
+  async getCurrentUser(): Promise<CurrentUserResponse> {
+    const response = await fetch(`${API_BASE_URL}/users/current`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error HTTP al obtener perfil: ${response.status}`);
+    }
+
+    return CurrentUserResponseSchema.parse(await response.json());
+  },
+
   /*
    * Obtiene la lista paginada de productos del backend.
    */

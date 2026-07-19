@@ -24,6 +24,7 @@ const envSchema = z.object({
   DB_NAME: z.string(),
   
   REDIS_URL: z.string().url(),
+  DEMO_USER_ID: z.string().uuid().default('550e8400-e29b-41d4-a716-446655440000'),
 });
 
 

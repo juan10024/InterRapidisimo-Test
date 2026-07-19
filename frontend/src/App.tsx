@@ -1,5 +1,6 @@
 import './index.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useUserStore } from './application/store/useUserStore'
 import { ThreeColumnDashboard } from './presentation/layouts/ThreeColumnDashboard'
 import { ProductDetailPage } from './presentation/pages/ProductDetail'
 import { Preloader } from './presentation/components/Preloader'
@@ -11,6 +12,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<'catalog' | 'detail' | 'checkout'>('catalog');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const loadCurrentUser = useUserStore(state => state.loadCurrentUser);
+
+  useEffect(() => {
+    void loadCurrentUser();
+  }, [loadCurrentUser]);
 
   // Mientras carga, mostrar el preloader
   if (isLoading) {

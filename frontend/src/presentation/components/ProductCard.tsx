@@ -14,6 +14,7 @@ interface Props {
 
 export function ProductCard({ product, onSelect }: Props) {
   const isProcessing = useUserStore(state => state.isProcessingReward);
+  const isUserReady = useUserStore(state => state.userId !== null);
   const wishlist = useCartStore(state => state.wishlist);
   const toggleWishlist = useCartStore(state => state.toggleWishlist);
   const addToCart = useCartStore(state => state.addToCart);
@@ -56,7 +57,7 @@ export function ProductCard({ product, onSelect }: Props) {
         {/* Botón de favorito sobre la imagen */}
         <button
           onClick={(e) => { e.stopPropagation(); handleFavorite(); }}
-          disabled={isProcessing}
+          disabled={isProcessing || !isUserReady}
           title={isFavorited ? 'Quitar de favoritos' : 'Agregar a favoritos'}
           className={`absolute top-2 left-2 w-6 h-6 flex items-center justify-center rounded-full border transition-all duration-200 ${
             isFavorited
@@ -82,7 +83,7 @@ export function ProductCard({ product, onSelect }: Props) {
         <span className="font-price-display text-[20px] text-primary">${product.price.toFixed(2)}</span>
         <button 
           onClick={handleAdd}
-          disabled={isProcessing}
+          disabled={isProcessing || !isUserReady}
           className="bg-primary-container text-black font-label-md text-[12px] px-3 py-2 rounded hard-shadow flex items-center gap-1 font-bold transition-transform"
         >
           <span className="material-symbols-outlined text-[16px]">shopping_cart</span>

@@ -1,5 +1,5 @@
 /*
- * descripcion: Este archivo contiene el store de Zustand para el carrito y la lista de deseos (wishlist)
+ * descripcion: Este archivo contiene el store de Zustand para el carrito y la lista de deseos
  */
 
 import { create } from 'zustand';
@@ -19,12 +19,7 @@ interface CartState {
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   toggleWishlist: (product: Product) => void;
-  /**
-   * Orquesta la compra: dispara la acción de recompensa por cada ítem en el
-   * backend (capa de Application) y luego limpia el carrito.
-   * El frontend NO calcula puntos — eso es responsabilidad del backend.
-   */
-  checkoutCart: () => Promise<void>;
+  checkoutCart: () => Promise<boolean>;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
@@ -75,6 +70,10 @@ export const useCartStore = create<CartState>((set, get) => ({
     const { cartItems } = get();
     const { triggerRewardAction } = useUserStore.getState();
 
+    if (!useUserStore.getState().userId) {
+      return false;
+    }
+
     // Disparar la recompensa de PURCHASE por cada ítem — el backend calcula los puntos
     await Promise.allSettled(
       cartItems.map(item =>
@@ -88,6 +87,7 @@ export const useCartStore = create<CartState>((set, get) => ({
 
     // Limpiar el carrito una vez procesadas las recompensas
     set({ cartItems: [] });
+    return true;
   },
 
   toggleWishlist: (product) => {
@@ -98,7 +98,7 @@ export const useCartStore = create<CartState>((set, get) => ({
       set({ wishlist: wishlist.filter(p => p.id !== product.id) });
     } else {
       set({ wishlist: [...wishlist, product] });
-      // Desencadenar la acción de recompensa (sólo al agregar)
+      // Desencadenar la acción de recompensa , sólo al agregar
       useUserStore.getState().triggerRewardAction(
         product.id,
         "FAVORITE",

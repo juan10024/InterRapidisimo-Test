@@ -5,9 +5,10 @@
 interface PaymentViewProps {
   onComplete: () => void;
   total: number;
+  disabled: boolean;
 }
 
-export function PaymentView({ onComplete, total }: PaymentViewProps) {
+export function PaymentView({ onComplete, total, disabled }: PaymentViewProps) {
   return (
     <div className="flex flex-col gap-sm animate-in fade-in slide-in-from-bottom-4 duration-300">
       <h2 className="font-display-lg text-headline-lg font-bold uppercase tracking-tight text-primary">
@@ -51,7 +52,7 @@ export function PaymentView({ onComplete, total }: PaymentViewProps) {
           </div>
         </div>
         <div className="flex justify-end mt-md pt-md border-t border-outline-variant">
-          <button onClick={onComplete} className="w-full bg-primary-container text-on-primary-container font-label-md text-label-md py-md rounded border border-outline-variant hover:-translate-y-0.5 hover:-translate-x-0.5 transition-transform active:translate-y-0 active:translate-x-0 active:shadow-none flex items-center justify-between px-md uppercase tracking-wider font-bold text-[18px]">
+          <button onClick={onComplete} disabled={disabled} className="w-full bg-primary-container text-on-primary-container font-label-md text-label-md py-md rounded border border-outline-variant hover:-translate-y-0.5 hover:-translate-x-0.5 transition-transform active:translate-y-0 active:translate-x-0 active:shadow-none flex items-center justify-between px-md uppercase tracking-wider font-bold text-[18px] disabled:opacity-50">
             <span>Autorizar Transferencia</span>
             <span className="flex items-center gap-2">Pagar ${total.toFixed(2)} <span className="material-symbols-outlined">check_circle</span></span>
           </button>

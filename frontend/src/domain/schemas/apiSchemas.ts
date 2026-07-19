@@ -48,6 +48,18 @@ export const RewardActionResponseSchema = z.object({
   })
 });
 
+// SCHEMA: PERFIL DE USUARIO ACTUAL
+export const CurrentUserResponseSchema = z.object({
+  status: z.literal("success"),
+  message: z.string(),
+  data: z.object({
+    user: z.object({
+      id: z.string().uuid(),
+      pointsBalance: z.number().int().nonnegative(),
+    }),
+  }),
+});
+
 // SCHEMA: PRODUCTO INDIVIDUAL
 export const SingleProductResponseSchema = z.object({
   status: z.literal("success"),

@@ -5,11 +5,11 @@
 import { useUserStore } from '../../application/store/useUserStore';
 
 export function GamificationHub() {
-  const { points, level, activities } = useUserStore();
+  const { points, activities, isLoadingUser, userError, loadCurrentUser } = useUserStore();
 
   const xpPerLevel = 1000;
   const xpProgress = points % xpPerLevel;
-  const currentLevel = level + Math.floor(points / xpPerLevel);
+  const currentLevel = 1 + Math.floor(points / xpPerLevel);
   const xpNeeded = xpPerLevel - xpProgress;
 
   return (
@@ -25,6 +25,18 @@ export function GamificationHub() {
           </div>
           <div className="font-label-sm text-[12px] text-on-surface-variant uppercase tracking-widest mt-1">Saldo Actual</div>
         </div>
+
+        {isLoadingUser && (
+          <p className="font-label-sm text-[12px] text-on-surface-variant text-center mb-md">Cargando perfil...</p>
+        )}
+        {userError && (
+          <div className="mb-md text-center">
+            <p className="font-label-sm text-[12px] text-custom-error">{userError}</p>
+            <button onClick={() => void loadCurrentUser()} className="mt-2 text-primary font-label-sm text-[12px] hover:underline">
+              Reintentar
+            </button>
+          </div>
+        )}
         
         <div className="mb-md">
           <div className="flex justify-between items-end mb-1">

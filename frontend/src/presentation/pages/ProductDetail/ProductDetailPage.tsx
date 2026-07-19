@@ -24,6 +24,7 @@ export function ProductDetailPage({ productId, onBack, onNavigate }: Props) {
   const { product, relatedProducts, isLoading, error } = useProductDetail(productId);
 
   const isProcessing = useUserStore(state => state.isProcessingReward);
+  const isUserReady = useUserStore(state => state.userId !== null);
 
   const wishlist = useCartStore(state => state.wishlist);
   const toggleWishlist = useCartStore(state => state.toggleWishlist);
@@ -155,7 +156,7 @@ export function ProductDetailPage({ productId, onBack, onNavigate }: Props) {
               <div className="flex flex-col">
                 <ProductInfo
                   product={product}
-                  isProcessing={isProcessing}
+                  isProcessing={isProcessing || !isUserReady}
                   isWishlisted={isWishlisted}
                   onBuy={handleBuy}
                   onFavorite={handleFavorite}

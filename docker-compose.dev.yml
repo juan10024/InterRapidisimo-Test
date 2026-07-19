@@ -63,6 +63,7 @@ services:
       - DB_PASSWORD=postgres_secret
       - DB_NAME=tienda_gamificada
       - REDIS_URL=redis://redis:6379
+      - DEMO_USER_ID=550e8400-e29b-41d4-a716-446655440000
     deploy:
       resources:
         limits:

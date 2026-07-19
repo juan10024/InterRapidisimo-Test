@@ -8,9 +8,10 @@ import { AppDataSource } from '../data-source.js';
 import { UserSchema } from '../orm-models/UserSchema.js';
 import { ProductSchema } from '../orm-models/ProductSchema.js';
 import { randomUUID } from 'crypto';
+import { env } from '../../config/env.js';
 
-// UUID Fijo para desarrollo
-export const TEST_USER_ID = "550e8400-e29b-41d4-a716-446655440000";
+// Identidad demo centralizada en la configuración del entorno.
+export const TEST_USER_ID = env.DEMO_USER_ID;
 
 async function runSeed() {
   console.log('🌱 Iniciando el proceso de Seeding...');

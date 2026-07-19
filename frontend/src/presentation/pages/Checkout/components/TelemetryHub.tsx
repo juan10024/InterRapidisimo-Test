@@ -7,7 +7,7 @@ import { useUserStore } from '../../../../application/store/useUserStore';
 
 export function TelemetryHub() {
   const points = useUserStore(state => state.points);
-  const level = useUserStore(state => state.level);
+  const level = 1 + Math.floor(points / 10000);
 
   return (
     <aside className="w-full xl:w-80 shrink-0 flex flex-col gap-lg">
