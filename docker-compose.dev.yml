@@ -69,10 +69,41 @@ services:
         limits:
           cpus: '1'
           memory: 1024M
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/v1/health').then(r => r.status === 200 ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 160s
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+    networks:
+      - ecommerce_network
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    container_name: tienda_frontend_dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DEMO_USER_ID=550e8400-e29b-41d4-a716-446655440000
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+    depends_on:
+      backend:
         condition: service_healthy
     networks:
       - ecommerce_network

@@ -1,4 +1,3 @@
- 
 # Base de dependencias
 FROM node:20-alpine AS base
 WORKDIR /app
@@ -9,7 +8,7 @@ RUN npm install
 FROM base AS development
 COPY . .
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["npx", "tsx", "watch", "src/app.ts"]
 
 # Compilación y Producción
 FROM base AS builder
@@ -19,7 +18,7 @@ RUN npm run build
 FROM node:20-alpine AS production
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --only=production
+RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY .env.production ./ 
 

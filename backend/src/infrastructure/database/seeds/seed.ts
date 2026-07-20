@@ -14,7 +14,7 @@ import { env } from '../../config/env.js';
 export const TEST_USER_ID = env.DEMO_USER_ID;
 
 async function runSeed() {
-  console.log('🌱 Iniciando el proceso de Seeding...');
+  console.log('Iniciando el proceso de Seeding...');
   
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
@@ -70,6 +70,38 @@ async function runSeed() {
         category: "muebles",
         imageUrl: "https://images.unsplash.com/photo-1505797149-43b0069ec26b?w=500",
         stock: 5,
+      },
+      {
+        id: randomUUID(),
+        name: "Auriculares Inalámbricos con Cancelación de Ruido",
+        price: 159.99,
+        category: "audio",
+        imageUrl: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500",
+        stock: 20,
+      },
+      {
+        id: randomUUID(),
+        name: "Micrófono de Condensador USB",
+        price: 89.90,
+        category: "audio",
+        imageUrl: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=500",
+        stock: 12,
+      },
+      {
+        id: randomUUID(),
+        name: "Mousepad XXL con Iluminación LED",
+        price: 29.99,
+        category: "accesorios",
+        imageUrl: "https://images.unsplash.com/photo-1629236715104-e53b6f0e4b85?w=500",
+        stock: 50,
+      },
+      {
+        id: randomUUID(),
+        name: "Cámara Web HD 1080p",
+        price: 65.00,
+        category: "perifericos",
+        imageUrl: "https://images.unsplash.com/photo-1726127461372-547b9ffa4236?w=500",
+        stock: 18,
       }
     ];
 
